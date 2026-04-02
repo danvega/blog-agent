@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: blog-agent
+
+blog-agent:
+  output-dir: blog-posts
+
+embabel:
+  agent:
+    platform:
+      models:
+        openai:
+          api-key: ${OPENAI_API_KEY}
+    logging:
+      personality: starwars
+  models:
+    default-llm: gpt-5-mini
+    llms:
+      reviewer: gpt-5
