@@ -4,6 +4,7 @@ spring:
 
 blog-agent:
   output-dir: blog-posts
+  number-of-keywords: 5
 
 embabel:
   agent:
@@ -14,6 +15,6 @@ embabel:
     logging:
       personality: starwars
   models:
-    default-llm: gpt-5-mini
+    default-llm: claude-sonnet-4-6
     llms:
-      reviewer: gpt-5
+      reviewer: claude-opus-4-6
