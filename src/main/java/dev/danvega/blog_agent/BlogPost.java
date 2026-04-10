@@ -1,6 +1,6 @@
 package dev.danvega.blog_agent;
 
-public sealed interface BlogPost permits DraftPost, ReviewedPost, FinalPost, PublishedPost {
+public sealed interface BlogPost permits DraftPost, ReviewedPost {
     String title();
     String content();
 }

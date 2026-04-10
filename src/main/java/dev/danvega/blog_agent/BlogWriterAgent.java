@@ -46,6 +46,7 @@ public class BlogWriterAgent {
                 );
     }
 
+    @AchievesGoal(description = "A reviewed and polished blog post")
     @Action(description = "Review and improve the draft")
     public ReviewedPost reviewDraft(DraftPost draft, Ai ai) {
         return ai
@@ -63,85 +64,6 @@ public class BlogWriterAgent {
                         summary of the changes you made as feedback.
                         """.formatted(draft.title(), draft.content())
                 );
-    }
-
-    @Action(description = "Add a TLDR summary to the top of the blog post")
-    public FinalPost addTldr(ReviewedPost post, Ai ai) {
-        String tldr = ai
-                .withDefaultLlm()
-                .withId("blog-post-tldr")
-                .creating(String.class)
-                .fromPrompt("""
-                        Write a one or two sentence TLDR summary for this blog post.
-                        Return only the summary text, nothing else.
-
-                        Title: %s
-                        Content:
-                        %s
-                        """.formatted(post.title(), post.content())
-                );
-
-        String contentWithTldr = "> **TLDR:** " + tldr + "\n\n" + post.content();
-        return new FinalPost(post.title(), contentWithTldr, post.feedback());
-    }
-
-    @AchievesGoal(description = "A reviewed and polished blog post with front matter")
-    @Action(description = "Add front matter to the top of the blog post")
-    public PublishedPost addFrontMatter(FinalPost post, Ai ai) {
-        FrontMatter frontMatter = ai
-                .withDefaultLlm()
-                .withId("blog-post-front-matter")
-                .withPromptContributors(List.of(Personas.JSON_OUTPUT))
-                .creating(FrontMatter.class)
-                .fromPrompt("""
-                        Generate front matter metadata for this blog post.
-                        Provide a concise description (1-2 sentences), relevant tags, and up to %d keywords.
-
-                        Title: %s
-                        Content:
-                        %s
-                        """.formatted(properties.numberOfKeywords(), post.title(), post.content())
-                );
-
-        String slug = post.title()
-                .toLowerCase()
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("^-|-$", "");
-
-        String tags = frontMatter.tags().stream()
-                .map(tag -> "  - " + tag)
-                .collect(Collectors.joining("\n"));
-
-        String keywords = frontMatter.keywords().stream()
-                .map(keyword -> "  - " + keyword)
-                .collect(Collectors.joining("\n"));
-
-        String frontMatterBlock = """
-                ---
-                title: "%s"
-                slug: %s
-                date: "%sT08:00:00.000Z"
-                published: true
-                description: "%s"
-                author: "Dan Vega"
-                tags:
-                %s
-                keywords:
-                %s
-                ---
-                """.formatted(
-                post.title(),
-                slug,
-                LocalDate.now(),
-                frontMatter.description(),
-                tags,
-                keywords
-        );
-
-        String contentWithFrontMatter = frontMatterBlock + "\n" + post.content();
-        PublishedPost publishedPost = new PublishedPost(post.title(), contentWithFrontMatter, post.feedback());
-        writeToFile(publishedPost);
-        return publishedPost;
     }
 
     private void writeToFile(BlogPost post) {
