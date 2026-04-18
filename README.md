@@ -61,7 +61,7 @@ The app runs in an interactive Spring Shell. Type `help` to see all available co
 | Command | Description |
 |---|---|
 | `x <topic>` | Execute the agent with a given topic (e.g., `x "Getting started with Spring Boot"`) |
-| `x -p <topic>` | Execute and print the exact prompts sent to the LLM |
+| `x <topic>` -p | Execute and print the exact prompts sent to the LLM |
 | `agents` | List all available agents |
 | `actions` | List all available actions agents can perform |
 | `goals` | List all available goals |
